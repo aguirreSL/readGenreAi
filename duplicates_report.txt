@@ -1,0 +1,4 @@
+Duplicate files with hash 5233eafeba5f9af9cc09c7185f818ba5b6774ec0789efe74ce0e562ace0968a5:
+  - /Volumes/photo/MobileBackup/Sergio/iPhone/2022/IMG_3442.HEIC
+  - /Volumes/photo/MobileBackup/Sergio/iPhone/2022/11/IMG_3442.HEIC
+
