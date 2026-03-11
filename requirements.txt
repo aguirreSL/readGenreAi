@@ -37,7 +37,7 @@ lazy_loader==0.4
 libclang==18.1.1
 librosa==0.10.2.post1
 llvmlite==0.44.0
-Markdown==3.7
+Markdown==3.8.1
 markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 marshmallow==3.26.1
