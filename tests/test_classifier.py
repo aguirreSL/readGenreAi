@@ -27,6 +27,26 @@ class TestClassifier(unittest.TestCase):
             genre = classify_genre("test_song", use_gemini=True)
             self.assertEqual(genre, "Techno")
             mock_run.assert_called_once()
+            
+    @patch('core.classifier.genai.Client')
+    def test_classify_genre_gemini(self, mock_client_class):
+        # Mock the client instance and its generate_content method
+        mock_client_instance = MagicMock()
+        mock_response = MagicMock()
+        
+        # The expected response is a JSON string because we request application/json
+        mock_response.text = '{"genre": "Deep House"}'
+        mock_client_instance.models.generate_content.return_value = mock_response
+        
+        mock_client_class.return_value = mock_client_instance
+        
+        # Provide a dummy API key to pass the missing key check
+        with patch.dict('os.environ', {'GEMINI_API_KEY': 'dummy_key'}):
+            genre = classify_genre("test_song", use_gemini=True)
+            
+            self.assertEqual(genre, "Deep House")
+            mock_client_class.assert_called_once_with(api_key='dummy_key')
+            mock_client_instance.models.generate_content.assert_called_once()
 
 if __name__ == '__main__':
     unittest.main()
