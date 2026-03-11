@@ -28,28 +28,33 @@ The repository also includes metadata modification utilities to write these pred
 
 ## File Breakdown
 
-### Main Classification Scripts
+### `core/` Package (Shared Logic)
+- **`config.py`**: Centralizes environment variable loading, configuration toggles (like `USE_GEMINI_API`), and the master list of accepted electronic genres.
+- **`metadata.py`**: Handles all standard audio reading/writing logic using the `mutagen` library to retrieve and inject genres into ID3, M4A, and WAV headers.
+- **`classifier.py`**: Centralizes the complex LLM logic. It handles secure API requests to Gemini 2.5 Flash (using Pydantic structured schemas) and seamless fallback shell requests to local Ollama models.
+- **`utils.py`**: Contains standard, reusable list-chunking and file-finding algorithms.
+
+### Main Execution Scripts
 - **`genreClassification.py`**: 
-  The primary, single-file processing script. It recursively scans directory files, checks for existing genres to avoid redundant API queries, classifies the track using `ollama`, and injects the result into the song's metadata tags. Handles multi-pass error correction directly.
+  The primary, single-file processor. It recursively scans directories, checks `core.metadata` for existing genres, classifies the track using `core.classifier`, and injects the result back into the audio file.
   
 - **`genreClassification_batch.py`**: 
-  An optimized version of the classifier that processes chunked batches of songs simultaneously (e.g., 5 songs per prompt). Designed to increase throughput for larger folders. Includes fallback logic to retry failed classifications.
+  An optimized version that processes chunked batches of songs simultaneously (e.g., 5 songs per prompt). Designed to increase throughput for larger folders. 
 
 - **`song_list_batch_text.py`**: 
-  A modern iteration of the batch processor that explicitly validates LLM outputs against an accepted list of 18 specific electronic genres. Includes exponential backoff for timeout handling and writes mapped genres to a text file rather than modifying the audio directly.
+  A modern iteration of the batch processor that explicitly validates LLM outputs against an accepted list of 18 specific electronic genres. Writes mapped genres to a text file rather than modifying the audio directly.
 
 ### Operational Utilities
 - **`list_music_files.py`**: 
-  Sequentially targets a root folder and writes all relative paths of recognized music file extensions (mp3, wav, flac, aac, m4a, ogg) to an output text document (`song_list.txt`).
+  Sequentially targets a root folder and writes all relative paths of recognized music file extensions to an output text document (`song_list.txt`).
 
 - **`find_duplicates.py`**: 
   A file de-duplication script that recursively scans a target directory. It groups files matching by identical SHA-256 content hashes (reading data in chunks for memory safety) and exports a textual report mapping hashes to identical file paths.
 
-### Auxiliary Files
-- **`readme.txt`**: 
-  Documentation covering the requirements, workflow, and basic feature list of the genre classifier.
-- **`requirements.txt`**: 
-  A robust list of Python dependencies. Notably contains ML/data science libraries (`tensorflow`, `scikit-learn`, `librosa`), metadata modules (`mutagen`), and API modules (`ollama`, `requests`), hinting at experimental audio analysis elements.
+### Auxiliary Files & Testing
+- **`tests/`**: Contains Python `unittest` code isolating and validating the core metadata editing logic (with mocked audio structures) and the Gemini/Ollama fallback classification logic.
+- **`readme.md`**: Documentation covering requirements, workflow, and basic feature list.
+- **`requirements.txt`**: A clean, minimal list of required dependencies (`mutagen`, `google-genai`, `pydantic`, `python-dotenv`).
 
 ---
 
